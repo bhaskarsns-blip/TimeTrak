@@ -1,0 +1,2221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swajay Time Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .admin-container {
+            max-width: 1400px;
+        }
+
+        .company-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #1e3c72;
+        }
+
+        .company-logo {
+            font-size: 48px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .company-tagline {
+            color: #7f8c8d;
+            font-size: 14px;
+            font-style: italic;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        h2 {
+            color: #34495e;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        h3 {
+            color: #34495e;
+            margin: 20px 0 15px 0;
+            font-size: 18px;
+        }
+
+        .access-type-banner {
+            background: #e8f5e9;
+            border: 2px solid #27ae60;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .access-type-banner.admin {
+            background: #fff3cd;
+            border-color: #f39c12;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #1e3c72;
+        }
+
+        .btn {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-block {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .btn-primary { background: #27ae60; color: white; }
+        .btn-primary:hover { background: #229954; }
+        
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-danger:hover { background: #c0392b; }
+        
+        .btn-warning { background: #f39c12; color: white; }
+        .btn-warning:hover { background: #e67e22; }
+        
+        .btn-info { background: #3498db; color: white; }
+        .btn-info:hover { background: #2980b9; }
+        
+        .btn-secondary { background: #95a5a6; color: white; }
+        .btn-secondary:hover { background: #7f8c8d; }
+        
+        .btn-success { background: #16a085; color: white; }
+        .btn-success:hover { background: #138d75; }
+
+        .btn-sm {
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .info-text {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 12px;
+            margin-top: 20px;
+            line-height: 1.6;
+        }
+
+        .header-panel {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .status-display {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .status-text {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .status-logged-out { color: #e74c3c; }
+        .status-logged-in { color: #27ae60; }
+        .status-on-break { color: #f39c12; }
+        .status-training { color: #3498db; }
+        .status-idle { color: #95a5a6; }
+
+        .time-display {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .status-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .stats-card {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px 0;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .stats-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .stats-card .big-number {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .stats-card.working .big-number { color: #27ae60; }
+        .stats-card.break .big-number { color: #f39c12; }
+        .stats-card.training .big-number { color: #3498db; }
+        .stats-card.idle .big-number { color: #95a5a6; }
+        .stats-card.offline .big-number { color: #e74c3c; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .status-map {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .employee-status-card {
+            background: white;
+            border-left: 5px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .employee-status-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .employee-status-card.working { border-left-color: #27ae60; }
+        .employee-status-card.break { border-left-color: #f39c12; }
+        .employee-status-card.training { border-left-color: #3498db; }
+        .employee-status-card.idle { border-left-color: #95a5a6; }
+        .employee-status-card.offline { border-left-color: #e74c3c; }
+
+        .employee-status-card h4 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .employee-status-card p {
+            color: #7f8c8d;
+            font-size: 13px;
+            margin: 3px 0;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+            border-radius: 10px;
+            background: #f8f9fa;
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: #34495e;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .clickable-row {
+            cursor: pointer;
+        }
+
+        .clickable-row:hover {
+            background: #e8f5e9 !important;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            background: #ecf0f1;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: #d5dbdb;
+        }
+
+        .tab.active {
+            background: #1e3c72;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .user-card {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .user-card:hover {
+            border-color: #1e3c72;
+            background: #f8f9fa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        .badge-info { background: #d1ecf1; color: #0c5460; }
+        .badge-secondary { background: #e2e3e5; color: #383d41; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            float: right;
+            font-size: 28px;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+
+        .close-modal:hover {
+            color: #2c3e50;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #ecf0f1;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #27ae60, #16a085);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            transition: width 0.3s;
+        }
+
+        .progress-fill.danger {
+            background: linear-gradient(90deg, #e74c3c, #c0392b);
+        }
+
+        .progress-fill.warning {
+            background: linear-gradient(90deg, #f39c12, #e67e22);
+        }
+
+        .platform-warning {
+            background: #fff3cd;
+            border: 2px solid #f39c12;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .platform-warning h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .button-grid, .status-selector {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <div id="modal" class="modal"></div>
+
+    <script>
+        // Detect platform
+        function isWindows() {
+            return navigator.platform.toLowerCase().includes('win');
+        }
+
+        function isAndroid() {
+            return /android/i.test(navigator.userAgent);
+        }
+
+        // Get access type from URL
+        function getAccessType() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('access') || 'employee';
+        }
+
+        // Data Management Class
+        class DataManager {
+            constructor() {
+                this.initializeData();
+                this.startBackgroundTracking();
+            }
+
+            initializeData() {
+                if (!localStorage.getItem('users')) {
+                    const defaultUsers = {
+                        'admin': {
+                            password: this.hashPassword('admin123'),
+                            role: 'admin',
+                            name: 'System Administrator',
+                            email: 'admin@swajay.com'
+                        }
+                    };
+                    localStorage.setItem('users', JSON.stringify(defaultUsers));
+                }
+
+                if (!localStorage.getItem('timeLogs')) {
+                    localStorage.setItem('timeLogs', JSON.stringify([]));
+                }
+
+                if (!localStorage.getItem('leaveRequests')) {
+                    localStorage.setItem('leaveRequests', JSON.stringify([]));
+                }
+
+                if (!localStorage.getItem('employeeStatus')) {
+                    localStorage.setItem('employeeStatus', JSON.stringify({}));
+                }
+
+                if (!localStorage.getItem('activeLogins')) {
+                    localStorage.setItem('activeLogins', JSON.stringify({}));
+                }
+            }
+
+            hashPassword(password) {
+                let hash = 0;
+                for (let i = 0; i < password.length; i++) {
+                    const char = password.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash;
+                }
+                return hash.toString();
+            }
+
+            getUsers() {
+                return JSON.parse(localStorage.getItem('users'));
+            }
+
+            saveUsers(users) {
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+
+            getLogs() {
+                return JSON.parse(localStorage.getItem('timeLogs'));
+            }
+
+            addLog(log) {
+                const logs = this.getLogs();
+                logs.push(log);
+                localStorage.setItem('timeLogs', JSON.stringify(logs));
+            }
+
+            getLeaveRequests() {
+                return JSON.parse(localStorage.getItem('leaveRequests'));
+            }
+
+            addLeaveRequest(request) {
+                const requests = this.getLeaveRequests();
+                request.id = Date.now().toString();
+                request.status = 'pending';
+                request.requestDate = new Date().toISOString();
+                requests.push(request);
+                localStorage.setItem('leaveRequests', JSON.stringify(requests));
+                return request;
+            }
+
+            updateLeaveRequest(id, status, adminComment = '') {
+                const requests = this.getLeaveRequests();
+                const request = requests.find(r => r.id === id);
+                if (request) {
+                    request.status = status;
+                    request.adminComment = adminComment;
+                    request.processedDate = new Date().toISOString();
+                    localStorage.setItem('leaveRequests', JSON.stringify(requests));
+                    return true;
+                }
+                return false;
+            }
+
+            getEmployeeStatus(empId) {
+                const statuses = JSON.parse(localStorage.getItem('employeeStatus'));
+                return statuses[empId] || 'offline';
+            }
+
+            setEmployeeStatus(empId, status) {
+                const statuses = JSON.parse(localStorage.getItem('employeeStatus'));
+                statuses[empId] = status;
+                localStorage.setItem('employeeStatus', JSON.stringify(statuses));
+            }
+
+            getActiveLogins() {
+                return JSON.parse(localStorage.getItem('activeLogins'));
+            }
+
+            setActiveLogin(empId, data) {
+                const activeLogins = this.getActiveLogins();
+                activeLogins[empId] = {
+                    ...data,
+                    lastSeen: new Date().toISOString()
+                };
+                localStorage.setItem('activeLogins', JSON.stringify(activeLogins));
+            }
+
+            removeActiveLogin(empId) {
+                const activeLogins = this.getActiveLogins();
+                delete activeLogins[empId];
+                localStorage.setItem('activeLogins', JSON.stringify(activeLogins));
+            }
+
+            startBackgroundTracking() {
+                // Update last seen every 30 seconds for active sessions
+                setInterval(() => {
+                    const empId = sessionStorage.getItem('currentEmpId');
+                    const status = sessionStorage.getItem('currentStatus');
+                    if (empId && status !== 'logged_out') {
+                        this.setActiveLogin(empId, {
+                            status: status,
+                            loginTime: sessionStorage.getItem('loginTime')
+                        });
+                    }
+                }, 30000);
+
+                // Clean up stale sessions (inactive for 5 minutes)
+                setInterval(() => {
+                    const activeLogins = this.getActiveLogins();
+                    const now = new Date();
+                    Object.keys(activeLogins).forEach(empId => {
+                        const lastSeen = new Date(activeLogins[empId].lastSeen);
+                        if ((now - lastSeen) > 300000) { // 5 minutes
+                            this.removeActiveLogin(empId);
+                        }
+                    });
+                }, 60000);
+            }
+
+            validateUser(empId, password) {
+                const users = this.getUsers();
+                if (users[empId] && users[empId].password === this.hashPassword(password)) {
+                    return {
+                        id: empId,
+                        name: users[empId].name,
+                        role: users[empId].role,
+                        email: users[empId].email || ''
+                    };
+                }
+                return null;
+            }
+
+            addUser(empId, name, password, role = 'employee', email = '') {
+                const users = this.getUsers();
+                if (users[empId]) {
+                    return { success: false, message: 'Employee ID already exists!' };
+                }
+                users[empId] = {
+                    password: this.hashPassword(password),
+                    role: role,
+                    name: name,
+                    email: email
+                };
+                this.saveUsers(users);
+                return { success: true, message: `${role === 'admin' ? 'Admin' : 'Employee'} added successfully!` };
+            }
+
+            updateUser(empId, name, password = null, email = '') {
+                const users = this.getUsers();
+                if (!users[empId]) {
+                    return { success: false, message: 'User not found!' };
+                }
+                users[empId].name = name;
+                users[empId].email = email;
+                if (password) {
+                    users[empId].password = this.hashPassword(password);
+                }
+                this.saveUsers(users);
+                return { success: true, message: 'User updated successfully!' };
+            }
+
+            deleteUser(empId) {
+                const users = this.getUsers();
+                if (!users[empId]) {
+                    return { success: false, message: 'User not found!' };
+                }
+                if (empId === 'admin') {
+                    return { success: false, message: 'Cannot delete main admin account!' };
+                }
+                delete users[empId];
+                this.saveUsers(users);
+                this.removeActiveLogin(empId);
+                return { success: true, message: 'User deleted successfully!' };
+            }
+
+            generateEmployeeId() {
+                const users = this.getUsers();
+                let counter = 1;
+                let newId = '';
+                do {
+                    newId = 'SWJ' + String(counter).padStart(4, '0');
+                    counter++;
+                } while (users[newId]);
+                return newId;
+            }
+
+            getEmployeeStats(empId, month = null, year = null) {
+                const logs = this.getLogs().filter(log => log.employee_id === empId);
+                
+                let filteredLogs = logs;
+                if (month !== null && year !== null) {
+                    filteredLogs = logs.filter(log => {
+                        const logDate = new Date(log.timestamp);
+                        return logDate.getMonth() === month && logDate.getFullYear() === year;
+                    });
+                }
+
+                const loginPairs = [];
+                let currentLogin = null;
+
+                filteredLogs.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+                filteredLogs.forEach(log => {
+                    if (log.action === 'LOGIN') {
+                        currentLogin = new Date(log.timestamp);
+                    } else if (log.action === 'LOGOUT' && currentLogin) {
+                        const logout = new Date(log.timestamp);
+                        loginPairs.push({
+                            login: currentLogin,
+                            logout: logout,
+                            hours: (logout - currentLogin) / (1000 * 60 * 60)
+                        });
+                        currentLogin = null;
+                    }
+                });
+
+                let breakMinutes = 0;
+                let currentBreak = null;
+                filteredLogs.forEach(log => {
+                    if (log.action === 'BREAK IN') {
+                        currentBreak = new Date(log.timestamp);
+                    } else if (log.action === 'BREAK OUT' && currentBreak) {
+                        const breakOut = new Date(log.timestamp);
+                        breakMinutes += (breakOut - currentBreak) / (1000 * 60);
+                        currentBreak = null;
+                    }
+                });
+
+                const totalHours = loginPairs.reduce((sum, pair) => sum + pair.hours, 0);
+                const netHours = totalHours - (breakMinutes / 60);
+
+                return {
+                    totalHours: totalHours.toFixed(2),
+                    netHours: netHours.toFixed(2),
+                    breakHours: (breakMinutes / 60).toFixed(2),
+                    days: loginPairs.length,
+                    loginPairs: loginPairs
+                };
+            }
+
+            getLiveStatusCounts() {
+                const users = this.getUsers();
+                const activeLogins = this.getActiveLogins();
+                const employeeStatuses = JSON.parse(localStorage.getItem('employeeStatus'));
+
+                const counts = {
+                    working: 0,
+                    break: 0,
+                    training: 0,
+                    idle: 0,
+                    offline: 0,
+                    total: 0
+                };
+
+                Object.entries(users).forEach(([empId, userData]) => {
+                    if (userData.role === 'employee') {
+                        counts.total++;
+                        const status = employeeStatuses[empId] || 'offline';
+                        const isActive = activeLogins[empId] && 
+                                       (new Date() - new Date(activeLogins[empId].lastSeen)) < 300000;
+
+                        if (!isActive || status === 'logged_out') {
+                            counts.offline++;
+                        } else {
+                            if (status === 'logged_in') counts.working++;
+                            else if (status === 'on_break') counts.break++;
+                            else if (status === 'training') counts.training++;
+                            else if (status === 'idle') counts.idle++;
+                        }
+                    }
+                });
+
+                return counts;
+            }
+
+            getEmployeesList() {
+                const users = this.getUsers();
+                const activeLogins = this.getActiveLogins();
+                const employeeStatuses = JSON.parse(localStorage.getItem('employeeStatus'));
+                const employees = [];
+
+                Object.entries(users).forEach(([empId, userData]) => {
+                    if (userData.role === 'employee') {
+                        const status = employeeStatuses[empId] || 'offline';
+                        const activeLogin = activeLogins[empId];
+                        const isActive = activeLogin && 
+                                       (new Date() - new Date(activeLogin.lastSeen)) < 300000;
+
+                        let displayStatus = 'offline';
+                        let statusTime = '';
+
+                        if (isActive) {
+                            displayStatus = status === 'logged_in' ? 'working' : 
+                                          status === 'on_break' ? 'break' :
+                                          status === 'training' ? 'training' :
+                                          status === 'idle' ? 'idle' : 'offline';
+                            
+                            if (activeLogin.loginTime) {
+                                const duration = Math.floor((new Date() - new Date(activeLogin.loginTime)) / 60000);
+                                statusTime = `${Math.floor(duration / 60)}h ${duration % 60}m`;
+                            }
+                        }
+
+                        employees.push({
+                            id: empId,
+                            name: userData.name,
+                            status: displayStatus,
+                            statusTime: statusTime,
+                            lastSeen: activeLogin ? activeLogin.lastSeen : null
+                        });
+                    }
+                });
+
+                return employees.sort((a, b) => {
+                    const statusOrder = { working: 1, training: 2, break: 3, idle: 4, offline: 5 };
+                    return statusOrder[a.status] - statusOrder[b.status];
+                });
+            }
+        }
+
+        // Application Class
+        class SwajayTimeTracker {
+            constructor() {
+                // Check platform
+                if (isAndroid()) {
+                    document.getElementById('app').innerHTML = this.getAndroidWarning();
+                    return;
+                }
+
+                this.dataManager = new DataManager();
+                this.currentUser = null;
+                this.currentStatus = 'logged_out';
+                this.timeInterval = null;
+                this.currentTab = 'dashboard';
+                this.selectedMonth = new Date().getMonth();
+                this.selectedYear = new Date().getFullYear();
+                this.accessType = getAccessType();
+                
+                this.render();
+
+                // Handle page visibility for background tracking
+                document.addEventListener('visibilitychange', () => {
+                    if (!document.hidden && this.currentUser && this.currentUser.role === 'employee') {
+                        this.updateBackgroundTracking();
+                    }
+                });
+
+                // Update background tracking before page unload
+                window.addEventListener('beforeunload', () => {
+                    if (this.currentUser && this.currentUser.role === 'employee' && this.currentStatus !== 'logged_out') {
+                        this.updateBackgroundTracking();
+                    }
+                });
+            }
+
+            getAndroidWarning() {
+                return `
+                    <div class="container">
+                        <div class="platform-warning">
+                            <h3>⚠️ Platform Not Supported</h3>
+                            <p style="color: #856404; margin: 15px 0;">
+                                Swajay Time Tracker is designed for <strong>Windows systems only</strong>.
+                                Android devices are not supported.
+                            </p>
+                            <p style="color: #856404;">
+                                Please access this application from a Windows computer.
+                            </p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            updateBackgroundTracking() {
+                const empId = this.currentUser.id;
+                this.dataManager.setActiveLogin(empId, {
+                    status: this.currentStatus,
+                    loginTime: sessionStorage.getItem('loginTime')
+                });
+            }
+
+            render() {
+                const app = document.getElementById('app');
+                
+                if (!this.currentUser) {
+                    app.innerHTML = this.getLoginScreen();
+                } else if (this.currentUser.role === 'admin') {
+                    app.innerHTML = this.getAdminPanel();
+                    this.startTimeUpdate();
+                    this.startDashboardRefresh();
+                } else {
+                    app.innerHTML = this.getEmployeePanel();
+                    this.startTimeUpdate();
+                }
+
+                this.attachEventListeners();
+            }
+
+            getLoginScreen() {
+                const isAdmin = this.accessType === 'admin';
+                
+                return `
+                    <div class="container">
+                        <div class="company-header">
+                            <div class="company-logo">SWAJAY</div>
+                            <div class="company-tagline">Professional Time Management System</div>
+                        </div>
+
+                        ${isAdmin ? `
+                            <div class="access-type-banner admin">
+                                <strong>🔐 Admin Access Portal</strong>
+                            </div>
+                        ` : `
+                            <div class="access-type-banner">
+                                <strong>✓ Employee Access Portal</strong>
+                            </div>
+                        `}
+                        
+                        <h1>Time Tracker Login</h1>
+                        
+                        <div class="form-group">
+                            <label for="empId">${isAdmin ? 'Admin' : 'Employee'} ID</label>
+                            <input type="text" id="empId" placeholder="Enter your ID" autocomplete="username">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" placeholder="Enter your Password" autocomplete="current-password">
+                        </div>
+
+                        <button class="btn btn-primary btn-block" onclick="app.handleLogin()">Login</button>
+
+                        ${!isAdmin ? `
+                            <div class="info-text">
+                                <strong>First time?</strong> Contact your admin for credentials<br>
+                                <strong>Need help?</strong> Email: support@swajay.com
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
+            getEmployeePanel() {
+                const statusClass = this.currentStatus === 'logged_in' ? 'status-logged-in' : 
+                                  this.currentStatus === 'on_break' ? 'status-on-break' : 
+                                  this.currentStatus === 'training' ? 'status-training' :
+                                  this.currentStatus === 'idle' ? 'status-idle' :
+                                  'status-logged-out';
+                
+                const statusText = this.currentStatus === 'logged_in' ? 'Working' : 
+                                 this.currentStatus === 'on_break' ? 'On Break' : 
+                                 this.currentStatus === 'training' ? 'Under Training' :
+                                 this.currentStatus === 'idle' ? 'Idle (No Work)' :
+                                 'Logged Out';
+
+                const stats = this.dataManager.getEmployeeStats(this.currentUser.id, this.selectedMonth, this.selectedYear);
+                const targetHours = stats.days * 8;
+                const progress = targetHours > 0 ? (stats.netHours / targetHours) * 100 : 0;
+                const progressClass = progress >= 100 ? '' : progress >= 75 ? 'warning' : 'danger';
+
+                const leaveRequests = this.dataManager.getLeaveRequests()
+                    .filter(r => r.employee_id === this.currentUser.id)
+                    .sort((a, b) => new Date(b.requestDate) - new Date(a.requestDate));
+
+                const pendingCount = leaveRequests.filter(r => r.status === 'pending').length;
+
+                return `
+                    <div class="container">
+                        <div class="company-header">
+                            <div class="company-logo">SWAJAY</div>
+                        </div>
+
+                        <div class="header-panel">
+                            <h2>Welcome, ${this.currentUser.name}</h2>
+                            <p>Employee ID: ${this.currentUser.id}</p>
+                        </div>
+
+                        <div class="status-display">
+                            <div class="status-text ${statusClass}">
+                                Status: ${statusText}
+                            </div>
+                            <div class="time-display" id="currentTime"></div>
+                        </div>
+
+                        ${this.currentStatus !== 'logged_out' ? `
+                        <div class="status-selector">
+                            <button class="btn ${this.currentStatus === 'logged_in' ? 'btn-success' : 'btn-secondary'}" 
+                                    onclick="app.setWorkStatus('logged_in')">
+                                💼 Working
+                            </button>
+                            <button class="btn ${this.currentStatus === 'training' ? 'btn-info' : 'btn-secondary'}" 
+                                    onclick="app.setWorkStatus('training')">
+                                📚 Training
+                            </button>
+                            <button class="btn ${this.currentStatus === 'idle' ? 'btn-warning' : 'btn-secondary'}" 
+                                    onclick="app.setWorkStatus('idle')">
+                                ⏸️ Idle
+                            </button>
+                        </div>
+                        ` : ''}
+
+                        <div class="button-grid">
+                            <button class="btn btn-primary" onclick="app.handleEmployeeLogin()" 
+                                    ${this.currentStatus !== 'logged_out' ? 'disabled' : ''}>
+                                LOGIN
+                            </button>
+                            <button class="btn btn-danger" onclick="app.handleEmployeeLogout()"
+                                    ${this.currentStatus === 'logged_out' ? 'disabled' : ''}>
+                                LOGOUT
+                            </button>
+                            <button class="btn btn-warning" onclick="app.handleBreakIn()"
+                                    ${this.currentStatus === 'logged_out' || this.currentStatus === 'on_break' ? 'disabled' : ''}>
+                                BREAK IN
+                            </button>
+                            <button class="btn btn-info" onclick="app.handleBreakOut()"
+                                    ${this.currentStatus !== 'on_break' ? 'disabled' : ''}>
+                                BREAK OUT
+                            </button>
+                        </div>
+
+                        <div class="stats-card">
+                            <h3>📊 This Month's Performance</h3>
+                            <div class="stats-grid">
+                                <div>
+                                    <p style="color: #7f8c8d; margin-bottom: 5px;">Days</p>
+                                    <p class="big-number" style="font-size: 24px;">${stats.days}</p>
+                                </div>
+                                <div>
+                                    <p style="color: #7f8c8d; margin-bottom: 5px;">Hours</p>
+                                    <p class="big-number" style="font-size: 24px;">${stats.netHours}h</p>
+                                </div>
+                                <div>
+                                    <p style="color: #7f8c8d; margin-bottom: 5px;">Target</p>
+                                    <p class="big-number" style="font-size: 24px;">${targetHours}h</p>
+                                </div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill ${progressClass}" style="width: ${Math.min(progress, 100)}%">
+                                    ${progress.toFixed(0)}%
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-warning btn-block" onclick="app.showLeaveRequestForm()">
+                            📝 Request Leave ${pendingCount > 0 ? `(${pendingCount} pending)` : ''}
+                        </button>
+
+                        <button class="btn btn-secondary btn-block" onclick="app.logout()">Logout</button>
+                    </div>
+                `;
+            }
+
+            getAdminPanel() {
+                return `
+                    <div class="container admin-container">
+                        <div class="company-header">
+                            <div class="company-logo">SWAJAY</div>
+                            <div class="company-tagline">Admin Control Panel</div>
+                        </div>
+
+                        <div class="header-panel">
+                            <h1>👨‍💼 Admin Dashboard</h1>
+                            <p>Welcome, ${this.currentUser.name}</p>
+                        </div>
+
+                        <div class="admin-tabs">
+                            <button class="tab ${this.currentTab === 'dashboard' ? 'active' : ''}" onclick="app.switchTab('dashboard')">
+                                📊 Live Dashboard
+                            </button>
+                            <button class="tab ${this.currentTab === 'employees' ? 'active' : ''}" onclick="app.switchTab('employees')">
+                                👥 Employees
+                            </button>
+                            <button class="tab ${this.currentTab === 'reports' ? 'active' : ''}" onclick="app.switchTab('reports')">
+                                📈 Reports
+                            </button>
+                            <button class="tab ${this.currentTab === 'leaves' ? 'active' : ''}" onclick="app.switchTab('leaves')">
+                                📝 Leaves ${this.getPendingLeavesCount() > 0 ? `(${this.getPendingLeavesCount()})` : ''}
+                            </button>
+                            <button class="tab ${this.currentTab === 'admins' ? 'active' : ''}" onclick="app.switchTab('admins')">
+                                🔐 Manage Admins
+                            </button>
+                        </div>
+
+                        <div id="tab-dashboard" class="tab-content ${this.currentTab === 'dashboard' ? 'active' : ''}">
+                            ${this.getLiveDashboard()}
+                        </div>
+
+                        <div id="tab-employees" class="tab-content ${this.currentTab === 'employees' ? 'active' : ''}">
+                            ${this.getEmployeesTab()}
+                        </div>
+
+                        <div id="tab-reports" class="tab-content ${this.currentTab === 'reports' ? 'active' : ''}">
+                            ${this.getReportsTab()}
+                        </div>
+
+                        <div id="tab-leaves" class="tab-content ${this.currentTab === 'leaves' ? 'active' : ''}">
+                            ${this.getLeavesTab()}
+                        </div>
+
+                        <div id="tab-admins" class="tab-content ${this.currentTab === 'admins' ? 'active' : ''}">
+                            ${this.getAdminsTab()}
+                        </div>
+
+                        <button class="btn btn-secondary btn-block" onclick="app.logout()">← Logout</button>
+                    </div>
+                `;
+            }
+
+            getLiveDashboard() {
+                const counts = this.dataManager.getLiveStatusCounts();
+                const employees = this.dataManager.getEmployeesList();
+
+                return `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2>📊 Live Employee Status</h2>
+                        <button class="btn btn-info" onclick="app.render()">🔄 Refresh</button>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stats-card working">
+                            <h3>💼 Working</h3>
+                            <div class="big-number">${counts.working}</div>
+                            <p style="color: #7f8c8d; font-size: 14px;">Active & Productive</p>
+                        </div>
+                        <div class="stats-card training">
+                            <h3>📚 Training</h3>
+                            <div class="big-number">${counts.training}</div>
+                            <p style="color: #7f8c8d; font-size: 14px;">Under Training</p>
+                        </div>
+                        <div class="stats-card break">
+                            <h3>☕ On Break</h3>
+                            <div class="big-number">${counts.break}</div>
+                            <p style="color: #7f8c8d; font-size: 14px;">Taking Break</p>
+                        </div>
+                        <div class="stats-card idle">
+                            <h3>⏸️ Idle</h3>
+                            <div class="big-number">${counts.idle}</div>
+                            <p style="color: #7f8c8d; font-size: 14px;">No Work/Files</p>
+                        </div>
+                        <div class="stats-card offline">
+                            <h3>📴 Offline</h3>
+                            <div class="big-number">${counts.offline}</div>
+                            <p style="color: #7f8c8d; font-size: 14px;">Not Logged In</p>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <h3>👥 Employee Status Map</h3>
+                        <p style="color: #7f8c8d; margin-bottom: 15px;">
+                            Real-time status of all ${counts.total} employees
+                        </p>
+                        
+                        <div class="status-map">
+                            ${employees.map(emp => `
+                                <div class="employee-status-card ${emp.status}">
+                                    <h4>${emp.name}</h4>
+                                    <p><strong>ID:</strong> ${emp.id}</p>
+                                    <p><strong>Status:</strong> 
+                                        ${emp.status === 'working' ? '💼 Working' : 
+                                          emp.status === 'training' ? '📚 Training' :
+                                          emp.status === 'break' ? '☕ On Break' :
+                                          emp.status === 'idle' ? '⏸️ Idle' : '📴 Offline'}
+                                    </p>
+                                    ${emp.statusTime ? `<p><strong>Duration:</strong> ${emp.statusTime}</p>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <strong>💡 Quick Stats:</strong><br>
+                        Total Employees: ${counts.total} | 
+                        Active Now: ${counts.working + counts.training + counts.break + counts.idle} | 
+                        Productivity Rate: ${counts.total > 0 ? ((counts.working + counts.training) / counts.total * 100).toFixed(1) : 0}%
+                    </div>
+                `;
+            }
+
+            startDashboardRefresh() {
+                if (this.dashboardInterval) clearInterval(this.dashboardInterval);
+                
+                this.dashboardInterval = setInterval(() => {
+                    if (this.currentUser && this.currentUser.role === 'admin' && this.currentTab === 'dashboard') {
+                        const dashboardContent = document.getElementById('tab-dashboard');
+                        if (dashboardContent) {
+                            dashboardContent.innerHTML = this.getLiveDashboard();
+                        }
+                    }
+                }, 30000); // Refresh every 30 seconds
+            }
+
+            getEmployeesTab() {
+                const users = this.dataManager.getUsers();
+                let userCards = '';
+
+                for (const [empId, userData] of Object.entries(users)) {
+                    if (userData.role === 'employee') {
+                        const stats = this.dataManager.getEmployeeStats(empId, this.selectedMonth, this.selectedYear);
+                        const targetHours = stats.days * 8;
+                        const progress = targetHours > 0 ? (stats.netHours / targetHours) * 100 : 0;
+                        const currentStatus = this.dataManager.getEmployeeStatus(empId);
+
+                        userCards += `
+                            <div class="user-card" onclick="app.viewEmployeeReport('${empId}')">
+                                <div class="user-info">
+                                    <h4>${userData.name} 
+                                        <span class="badge badge-${currentStatus === 'logged_in' ? 'success' : currentStatus === 'on_break' ? 'warning' : 'secondary'}">
+                                            ${currentStatus === 'logged_in' ? 'Active' : currentStatus === 'on_break' ? 'Break' : 'Offline'}
+                                        </span>
+                                    </h4>
+                                    <p>ID: ${empId} | This Month: ${stats.netHours}h / ${targetHours}h (${progress.toFixed(0)}%)</p>
+                                </div>
+                                <div class="user-actions" onclick="event.stopPropagation()">
+                                    <button class="btn btn-info btn-sm" onclick="app.viewEmployeeReport('${empId}')">
+                                        📊 Report
+                                    </button>
+                                    <button class="btn btn-warning btn-sm" onclick="app.editEmployee('${empId}')">
+                                        ✏️ Edit
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="app.deleteEmployee('${empId}')">
+                                        🗑️
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                const employeeCount = Object.values(users).filter(u => u.role === 'employee').length;
+
+                return `
+                    <div style="margin-bottom: 20px;">
+                        <button class="btn btn-success" onclick="app.showAddEmployeeModal()">
+                            ➕ Add New Employee
+                        </button>
+                    </div>
+
+                    <h3>📋 Employee List (${employeeCount} employees)</h3>
+                    <p style="color: #7f8c8d; margin-bottom: 15px;">Click on an employee to view detailed report</p>
+                    
+                    ${userCards || '<p style="text-align:center; color:#7f8c8d; padding:20px;">No employees added yet.</p>'}
+                `;
+            }
+
+            getReportsTab() {
+                const users = this.dataManager.getUsers();
+                const employees = Object.entries(users).filter(([id, data]) => data.role === 'employee');
+
+                const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                               'July', 'August', 'September', 'October', 'November', 'December'];
+                const years = [2024, 2025, 2026, 2027];
+
+                let reportTable = '';
+                employees.forEach(([empId, userData]) => {
+                    const stats = this.dataManager.getEmployeeStats(empId, this.selectedMonth, this.selectedYear);
+                    const targetHours = stats.days * 8;
+                    const progress = targetHours > 0 ? (stats.netHours / targetHours) * 100 : 0;
+                    const statusBadge = progress >= 100 ? 'success' : progress >= 75 ? 'warning' : 'danger';
+
+                    reportTable += `
+                        <tr class="clickable-row" onclick="app.viewEmployeeReport('${empId}')">
+                            <td>${userData.name}</td>
+                            <td>${empId}</td>
+                            <td>${stats.days}</td>
+                            <td>${stats.netHours}h</td>
+                            <td>${targetHours}h</td>
+                            <td>
+                                <span class="badge badge-${statusBadge}">${progress.toFixed(0)}%</span>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                return `
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
+                        <label>Month:</label>
+                        <select id="monthSelect" onchange="app.changeReportPeriod()">
+                            ${months.map((m, i) => `<option value="${i}" ${i === this.selectedMonth ? 'selected' : ''}>${m}</option>`).join('')}
+                        </select>
+                        <label>Year:</label>
+                        <select id="yearSelect" onchange="app.changeReportPeriod()">
+                            ${years.map(y => `<option value="${y}" ${y === this.selectedYear ? 'selected' : ''}>${y}</option>`).join('')}
+                        </select>
+                        <button class="btn btn-success" onclick="app.exportMonthlyReport()">📥 Export CSV</button>
+                    </div>
+
+                    <div class="table-container">
+                        <h3>📈 Monthly Performance - ${months[this.selectedMonth]} ${this.selectedYear}</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Employee Name</th>
+                                    <th>ID</th>
+                                    <th>Days</th>
+                                    <th>Hours</th>
+                                    <th>Target</th>
+                                    <th>Achievement</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${reportTable || '<tr><td colspan="6" style="text-align:center;">No data</td></tr>'}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            getLeavesTab() {
+                const requests = this.dataManager.getLeaveRequests()
+                    .sort((a, b) => new Date(b.requestDate) - new Date(a.requestDate));
+
+                const pending = requests.filter(r => r.status === 'pending');
+                const processed = requests.filter(r => r.status !== 'pending');
+
+                return `
+                    <div class="table-container">
+                        <h3>⏳ Pending Leave Requests (${pending.length})</h3>
+                        ${pending.length > 0 ? pending.map(req => `
+                            <div class="leave-request-card pending" style="border: 2px solid #f39c12; padding: 15px; margin: 10px 0; border-radius: 8px;">
+                                <div style="display: flex; justify-content: space-between; align-items: start;">
+                                    <div>
+                                        <h4 style="color: #2c3e50;">${req.employee_name} (${req.employee_id})</h4>
+                                        <p style="margin: 5px 0;"><strong>${req.leaveType}</strong></p>
+                                        <p style="margin: 5px 0;">
+                                            ${new Date(req.startDate).toLocaleDateString()} - ${new Date(req.endDate).toLocaleDateString()}
+                                            (${req.days} days)
+                                        </p>
+                                        <p style="margin: 10px 0;">${req.reason}</p>
+                                    </div>
+                                    <div style="display: flex; gap: 5px;">
+                                        <button class="btn btn-success btn-sm" onclick="app.processLeaveRequest('${req.id}', 'approved')">
+                                            ✓ Approve
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" onclick="app.processLeaveRequest('${req.id}', 'rejected')">
+                                            ✗ Reject
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('') : '<p style="text-align:center; padding:20px;">No pending requests</p>'}
+                    </div>
+
+                    <div class="table-container">
+                        <h3>✅ Processed Requests</h3>
+                        ${processed.slice(0, 10).map(req => `
+                            <div style="border: 2px solid ${req.status === 'approved' ? '#27ae60' : '#e74c3c'}; padding: 15px; margin: 10px 0; border-radius: 8px;">
+                                <h4>${req.employee_name} (${req.employee_id})
+                                    <span class="badge badge-${req.status === 'approved' ? 'success' : 'danger'}">
+                                        ${req.status.toUpperCase()}
+                                    </span>
+                                </h4>
+                                <p style="margin: 5px 0;"><strong>${req.leaveType}</strong> | 
+                                ${new Date(req.startDate).toLocaleDateString()} - ${new Date(req.endDate).toLocaleDateString()}</p>
+                                ${req.adminComment ? `<p style="margin: 10px 0;"><em>Admin: ${req.adminComment}</em></p>` : ''}
+                            </div>
+                        `).join('') || '<p style="text-align:center; padding:20px;">No processed requests</p>'}
+                    </div>
+                `;
+            }
+
+            getAdminsTab() {
+                const users = this.dataManager.getUsers();
+                let adminCards = '';
+
+                for (const [empId, userData] of Object.entries(users)) {
+                    if (userData.role === 'admin') {
+                        adminCards += `
+                            <div class="user-card">
+                                <div class="user-info">
+                                    <h4>${userData.name} ${empId === 'admin' ? '(Main Admin)' : ''}</h4>
+                                    <p>ID: ${empId} | Email: ${userData.email || 'Not provided'}</p>
+                                </div>
+                                <div class="user-actions">
+                                    ${empId !== 'admin' ? `
+                                        <button class="btn btn-warning btn-sm" onclick="app.editEmployee('${empId}')">
+                                            ✏️ Edit
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" onclick="app.deleteAdmin('${empId}')">
+                                            🗑️ Remove
+                                        </button>
+                                    ` : `
+                                        <button class="btn btn-warning btn-sm" onclick="app.editEmployee('${empId}')">
+                                            ✏️ Edit
+                                        </button>
+                                    `}
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                const adminCount = Object.values(users).filter(u => u.role === 'admin').length;
+
+                return `
+                    <div style="margin-bottom: 20px;">
+                        <button class="btn btn-success" onclick="app.showAddAdminModal()">
+                            ➕ Add New Admin
+                        </button>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>⚠️ Important:</strong> Admin accounts have full system access. Only create admin accounts for trusted managers and supervisors.
+                    </div>
+
+                    <div class="alert alert-info">
+                        <strong>📱 Admin Access Link:</strong><br>
+                        Share this link with admins: <code>${window.location.origin}${window.location.pathname}?access=admin</code>
+                    </div>
+
+                    <h3>🔐 Admin Accounts (${adminCount})</h3>
+                    
+                    ${adminCards}
+                `;
+            }
+
+            getPendingLeavesCount() {
+                return this.dataManager.getLeaveRequests().filter(r => r.status === 'pending').length;
+            }
+
+            switchTab(tabName) {
+                this.currentTab = tabName;
+                this.render();
+            }
+
+            changeReportPeriod() {
+                this.selectedMonth = parseInt(document.getElementById('monthSelect').value);
+                this.selectedYear = parseInt(document.getElementById('yearSelect').value);
+                this.render();
+            }
+
+            setWorkStatus(status) {
+                if (this.currentStatus === 'logged_out') return;
+                
+                this.currentStatus = status;
+                this.dataManager.setEmployeeStatus(this.currentUser.id, status);
+                this.updateBackgroundTracking();
+                this.render();
+                this.showAlert('success', `Status updated to: ${
+                    status === 'logged_in' ? 'Working' : 
+                    status === 'training' ? 'Training' : 
+                    'Idle'
+                }`);
+            }
+
+            viewEmployeeReport(empId) {
+                const users = this.dataManager.getUsers();
+                const employee = users[empId];
+                const stats = this.dataManager.getEmployeeStats(empId, this.selectedMonth, this.selectedYear);
+                const targetHours = stats.days * 8;
+                const progress = targetHours > 0 ? (stats.netHours / targetHours) * 100 : 0;
+
+                const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                               'July', 'August', 'September', 'October', 'November', 'December'];
+
+                let dailyBreakdown = '';
+                const logsByDate = {};
+                
+                this.dataManager.getLogs()
+                    .filter(log => log.employee_id === empId)
+                    .filter(log => {
+                        const logDate = new Date(log.timestamp);
+                        return logDate.getMonth() === this.selectedMonth && logDate.getFullYear() === this.selectedYear;
+                    })
+                    .forEach(log => {
+                        const date = new Date(log.timestamp).toDateString();
+                        if (!logsByDate[date]) logsByDate[date] = [];
+                        logsByDate[date].push(log);
+                    });
+
+                for (const [date, logs] of Object.entries(logsByDate)) {
+                    const login = logs.find(l => l.action === 'LOGIN');
+                    const logout = logs.find(l => l.action === 'LOGOUT');
+                    let hours = 'Incomplete';
+                    
+                    if (login && logout) {
+                        const diff = (new Date(logout.timestamp) - new Date(login.timestamp)) / (1000 * 60 * 60);
+                        hours = diff.toFixed(2) + 'h';
+                    }
+
+                    dailyBreakdown += `
+                        <tr>
+                            <td>${date}</td>
+                            <td>${login ? new Date(login.timestamp).toLocaleTimeString() : '-'}</td>
+                            <td>${logout ? new Date(logout.timestamp).toLocaleTimeString() : '-'}</td>
+                            <td>${hours}</td>
+                        </tr>
+                    `;
+                }
+
+                const modal = document.getElementById('modal');
+                modal.innerHTML = `
+                    <div class="modal-content" style="max-width: 800px;">
+                        <div class="modal-header">
+                            <span class="close-modal" onclick="app.closeModal()">&times;</span>
+                            <h2>📊 Employee Report: ${employee.name}</h2>
+                        </div>
+
+                        <div style="background: #ecf0f1; padding: 15px; border-radius: 10px; margin: 20px 0;">
+                            <h3>${months[this.selectedMonth]} ${this.selectedYear} Summary</h3>
+                            <div class="stats-grid">
+                                <div class="stats-card">
+                                    <h4>Days Worked</h4>
+                                    <div class="big-number" style="font-size: 28px;">${stats.days}</div>
+                                </div>
+                                <div class="stats-card">
+                                    <h4>Total Hours</h4>
+                                    <div class="big-number" style="font-size: 28px;">${stats.netHours}h</div>
+                                </div>
+                                <div class="stats-card">
+                                    <h4>Target Hours</h4>
+                                    <div class="big-number" style="font-size: 28px;">${targetHours}h</div>
+                                </div>
+                                <div class="stats-card">
+                                    <h4>Break Time</h4>
+                                    <div class="big-number" style="font-size: 28px;">${stats.breakHours}h</div>
+                                </div>
+                            </div>
+
+                            <div class="progress-bar">
+                                <div class="progress-fill ${progress >= 100 ? '' : progress >= 75 ? 'warning' : 'danger'}" 
+                                     style="width: ${Math.min(progress, 100)}%">
+                                    ${progress.toFixed(0)}% Achievement
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-container">
+                            <h3>📅 Daily Breakdown</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Login</th>
+                                        <th>Logout</th>
+                                        <th>Hours</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${dailyBreakdown || '<tr><td colspan="4" style="text-align:center;">No data</td></tr>'}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <button class="btn btn-secondary btn-block" onclick="app.closeModal()">Close</button>
+                    </div>
+                `;
+                modal.classList.add('active');
+            }
+
+            showLeaveRequestForm() {
+                const modal = document.getElementById('modal');
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <span class="close-modal" onclick="app.closeModal()">&times;</span>
+                            <h2>📝 Request Leave</h2>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="leaveType">Leave Type</label>
+                            <select id="leaveType">
+                                <option value="Sick Leave">Sick Leave</option>
+                                <option value="Casual Leave">Casual Leave</option>
+                                <option value="Annual Leave">Annual Leave</option>
+                                <option value="Emergency Leave">Emergency Leave</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="startDate">Start Date</label>
+                            <input type="date" id="startDate">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="endDate">End Date</label>
+                            <input type="date" id="endDate">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="leaveReason">Reason</label>
+                            <textarea id="leaveReason" placeholder="Please provide a reason"></textarea>
+                        </div>
+
+                        <button class="btn btn-success btn-block" onclick="app.submitLeaveRequest()">
+                            Submit Request
+                        </button>
+                        <button class="btn btn-secondary btn-block" onclick="app.closeModal()">
+                            Cancel
+                        </button>
+                    </div>
+                `;
+                modal.classList.add('active');
+
+                document.getElementById('startDate').min = new Date().toISOString().split('T')[0];
+                document.getElementById('endDate').min = new Date().toISOString().split('T')[0];
+            }
+
+            submitLeaveRequest() {
+                const leaveType = document.getElementById('leaveType').value;
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                const reason = document.getElementById('leaveReason').value.trim();
+
+                if (!startDate || !endDate || !reason) {
+                    alert('Please fill all fields!');
+                    return;
+                }
+
+                if (new Date(endDate) < new Date(startDate)) {
+                    alert('End date cannot be before start date!');
+                    return;
+                }
+
+                const days = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)) + 1;
+
+                const request = {
+                    employee_id: this.currentUser.id,
+                    employee_name: this.currentUser.name,
+                    leaveType: leaveType,
+                    startDate: startDate,
+                    endDate: endDate,
+                    days: days,
+                    reason: reason
+                };
+
+                this.dataManager.addLeaveRequest(request);
+                alert('Leave request submitted! Your admin will review it.');
+                this.closeModal();
+                this.render();
+            }
+
+            processLeaveRequest(id, status) {
+                const comment = prompt(`${status === 'approved' ? 'Approve' : 'Reject'} this request. Add a comment (optional):`);
+                if (comment !== null) {
+                    this.dataManager.updateLeaveRequest(id, status, comment);
+                    this.showAlert('success', `Leave request ${status}!`);
+                    this.render();
+                }
+            }
+
+            showAddEmployeeModal() {
+                const suggestedId = this.dataManager.generateEmployeeId();
+                const modal = document.getElementById('modal');
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <span class="close-modal" onclick="app.closeModal()">&times;</span>
+                            <h2>➕ Add New Employee</h2>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="newEmpId">Employee ID</label>
+                            <input type="text" id="newEmpId" value="${suggestedId}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="newEmpName">Full Name</label>
+                            <input type="text" id="newEmpName" placeholder="e.g., John Smith">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="newEmpEmail">Email (Optional)</label>
+                            <input type="email" id="newEmpEmail" placeholder="employee@swajay.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="newEmpPassword">Password</label>
+                            <input type="text" id="newEmpPassword" placeholder="Create a password">
+                        </div>
+
+                        <button class="btn btn-success btn-block" onclick="app.addEmployee()">
+                            Create Employee
+                        </button>
+                        <button class="btn btn-secondary btn-block" onclick="app.closeModal()">
+                            Cancel
+                        </button>
+                    </div>
+                `;
+                modal.classList.add('active');
+            }
+
+            showAddAdminModal() {
+                const modal = document.getElementById('modal');
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <span class="close-modal" onclick="app.closeModal()">&times;</span>
+                            <h2>🔐 Add New Admin</h2>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            ⚠️ Admin accounts have full system access
+                        </div>
+
+                        <div class="form-group">
+                            <label for="newAdminId">Admin ID</label>
+                            <input type="text" id="newAdminId" placeholder="e.g., ADM002">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="newAdminName">Full Name</label>
+                            <input type="text" id="newAdminName" placeholder="e.g., Sarah Manager">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="newAdminEmail">Email</label>
+                            <input type="email" id="newAdminEmail" placeholder="admin@swajay.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="newAdminPassword">Password</label>
+                            <input type="text" id="newAdminPassword" placeholder="Create a strong password">
+                        </div>
+
+                        <button class="btn btn-success btn-block" onclick="app.addAdmin()">
+                            Create Admin Account
+                        </button>
+                        <button class="btn btn-secondary btn-block" onclick="app.closeModal()">
+                            Cancel
+                        </button>
+                    </div>
+                `;
+                modal.classList.add('active');
+            }
+
+            addEmployee() {
+                const empId = document.getElementById('newEmpId').value.trim();
+                const name = document.getElementById('newEmpName').value.trim();
+                const email = document.getElementById('newEmpEmail').value.trim();
+                const password = document.getElementById('newEmpPassword').value.trim();
+
+                if (!empId || !name || !password) {
+                    alert('Please fill required fields!');
+                    return;
+                }
+
+                const result = this.dataManager.addUser(empId, name, password, 'employee', email);
+                
+                if (result.success) {
+                    this.closeModal();
+                    this.showCredentialsModal(empId, name, password, 'employee');
+                    this.render();
+                } else {
+                    alert(result.message);
+                }
+            }
+
+            addAdmin() {
+                const empId = document.getElementById('newAdminId').value.trim();
+                const name = document.getElementById('newAdminName').value.trim();
+                const email = document.getElementById('newAdminEmail').value.trim();
+                const password = document.getElementById('newAdminPassword').value.trim();
+
+                if (!empId || !name || !email || !password) {
+                    alert('Please fill all fields!');
+                    return;
+                }
+
+                const result = this.dataManager.addUser(empId, name, password, 'admin', email);
+                
+                if (result.success) {
+                    this.closeModal();
+                    this.showCredentialsModal(empId, name, password, 'admin');
+                    this.render();
+                } else {
+                    alert(result.message);
+                }
+            }
+
+            showCredentialsModal(empId, name, password, role) {
+                const employeeLink = `${window.location.origin}${window.location.pathname}`;
+                const adminLink = `${window.location.origin}${window.location.pathname}?access=admin`;
+
+                const modal = document.getElementById('modal');
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <span class="close-modal" onclick="app.closeModal()">&times;</span>
+                            <h2>✅ ${role === 'admin' ? 'Admin' : 'Employee'} Created!</h2>
+                        </div>
+
+                        <div style="background: #e8f5e9; border: 2px solid #27ae60; border-radius: 10px; padding: 20px; margin: 20px 0;">
+                            <h3 style="color: #27ae60;">📋 Credentials for ${name}</h3>
+                            
+                            <div style="background: white; padding: 10px; margin: 10px 0; border-radius: 5px; font-family: monospace;">
+                                <strong>${role === 'admin' ? 'Admin' : 'Employee'} ID:</strong> ${empId}
+                            </div>
+                            <div style="background: white; padding: 10px; margin: 10px 0; border-radius: 5px; font-family: monospace;">
+                                <strong>Password:</strong> ${password}
+                            </div>
+
+                            <div style="background: white; padding: 10px; margin: 10px 0; border-radius: 5px;">
+                                <strong>Access Link:</strong><br>
+                                <code style="font-size: 12px; word-break: break-all;">${role === 'admin' ? adminLink : employeeLink}</code>
+                            </div>
+
+                            <p style="margin-top: 15px; color: #e74c3c; font-size: 14px;">
+                                ⚠️ Save these! They won't be shown again.
+                            </p>
+                        </div>
+
+                        <button class="btn btn-primary btn-block" onclick="app.copyAllCredentials('${empId}', '${password}', '${role}', '${role === 'admin' ? adminLink : employeeLink}')">
+                            📋 Copy All Info
+                        </button>
+                        <button class="btn btn-secondary btn-block" onclick="app.closeModal()">
+                            Close
+                        </button>
+                    </div>
+                `;
+                modal.classList.add('active');
+            }
+
+            copyAllCredentials(empId, password, role, link) {
+                const text = `SWAJAY Time Tracker - ${role === 'admin' ? 'Admin' : 'Employee'} Login
+
+Name: [Name]
+Employee ID: ${empId}
+Password: ${password}
+
+Access Link: ${link}
+
+Please keep this information secure.`;
+                
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Credentials copied! Share with the user.');
+                }).catch(() => {
+                    alert('Could not copy. Please write down manually.');
+                });
+            }
+
+            editEmployee(empId) {
+                const users = this.dataManager.getUsers();
+                const user = users[empId];
+
+                const modal = document.getElementById('modal');
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <span class="close-modal" onclick="app.closeModal()">&times;</span>
+                            <h2>✏️ Edit ${user.role === 'admin' ? 'Admin' : 'Employee'}</h2>
+                        </div>
+
+                        <div class="form-group">
+                            <label>ID</label>
+                            <input type="text" value="${empId}" disabled>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editEmpName">Full Name</label>
+                            <input type="text" id="editEmpName" value="${user.name}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editEmpEmail">Email</label>
+                            <input type="email" id="editEmpEmail" value="${user.email || ''}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editEmpPassword">New Password (leave blank to keep current)</label>
+                            <input type="text" id="editEmpPassword" placeholder="Enter new password">
+                        </div>
+
+                        <button class="btn btn-success btn-block" onclick="app.updateEmployee('${empId}')">
+                            Save Changes
+                        </button>
+                        <button class="btn btn-secondary btn-block" onclick="app.closeModal()">
+                            Cancel
+                        </button>
+                    </div>
+                `;
+                modal.classList.add('active');
+            }
+
+            updateEmployee(empId) {
+                const name = document.getElementById('editEmpName').value.trim();
+                const email = document.getElementById('editEmpEmail').value.trim();
+                const password = document.getElementById('editEmpPassword').value.trim();
+
+                if (!name) {
+                    alert('Name cannot be empty!');
+                    return;
+                }
+
+                const result = this.dataManager.updateUser(empId, name, password || null, email);
+                
+                if (result.success) {
+                    alert(result.message);
+                    this.closeModal();
+                    this.render();
+                } else {
+                    alert(result.message);
+                }
+            }
+
+            deleteEmployee(empId) {
+                if (confirm('Delete this employee? This cannot be undone!')) {
+                    const result = this.dataManager.deleteUser(empId);
+                    if (result.success) {
+                        alert(result.message);
+                        this.render();
+                    } else {
+                        alert(result.message);
+                    }
+                }
+            }
+
+            deleteAdmin(empId) {
+                if (confirm('Remove this admin? They will lose all access!')) {
+                    const result = this.dataManager.deleteUser(empId);
+                    if (result.success) {
+                        alert(result.message);
+                        this.render();
+                    } else {
+                        alert(result.message);
+                    }
+                }
+            }
+
+            closeModal() {
+                const modal = document.getElementById('modal');
+                modal.classList.remove('active');
+                modal.innerHTML = '';
+            }
+
+            handleLogin() {
+                const empId = document.getElementById('empId').value.trim();
+                const password = document.getElementById('password').value.trim();
+
+                if (!empId || !password) {
+                    alert('Please enter both ID and Password');
+                    return;
+                }
+
+                const user = this.dataManager.validateUser(empId, password);
+                
+                if (user) {
+                    // Check if admin trying to access employee portal or vice versa
+                    if (this.accessType === 'admin' && user.role !== 'admin') {
+                        alert('This is the admin portal. Please use the employee link.');
+                        return;
+                    }
+                    if (this.accessType === 'employee' && user.role === 'admin') {
+                        alert('Please use the admin access link.');
+                        return;
+                    }
+
+                    this.currentUser = user;
+                    this.currentStatus = 'logged_out';
+                    sessionStorage.setItem('currentEmpId', user.id);
+                    this.render();
+                } else {
+                    alert('Invalid credentials');
+                }
+            }
+
+            handleEmployeeLogin() {
+                const loginTime = new Date().toISOString();
+                sessionStorage.setItem('loginTime', loginTime);
+                sessionStorage.setItem('currentStatus', 'logged_in');
+                
+                this.logAction('LOGIN');
+                this.currentStatus = 'logged_in';
+                this.dataManager.setEmployeeStatus(this.currentUser.id, 'logged_in');
+                this.dataManager.setActiveLogin(this.currentUser.id, {
+                    status: 'logged_in',
+                    loginTime: loginTime
+                });
+                
+                this.render();
+                this.showAlert('success', 'Logged in successfully!');
+            }
+
+            handleEmployeeLogout() {
+                this.logAction('LOGOUT');
+                this.currentStatus = 'logged_out';
+                this.dataManager.setEmployeeStatus(this.currentUser.id, 'logged_out');
+                this.dataManager.removeActiveLogin(this.currentUser.id);
+                
+                sessionStorage.removeItem('loginTime');
+                sessionStorage.removeItem('currentStatus');
+                
+                this.render();
+                this.showAlert('success', 'Logged out successfully!');
+            }
+
+            handleBreakIn() {
+                this.logAction('BREAK IN');
+                this.currentStatus = 'on_break';
+                this.dataManager.setEmployeeStatus(this.currentUser.id, 'on_break');
+                sessionStorage.setItem('currentStatus', 'on_break');
+                this.updateBackgroundTracking();
+                this.render();
+                this.showAlert('success', 'Break started!');
+            }
+
+            handleBreakOut() {
+                this.logAction('BREAK OUT');
+                this.currentStatus = 'logged_in';
+                this.dataManager.setEmployeeStatus(this.currentUser.id, 'logged_in');
+                sessionStorage.setItem('currentStatus', 'logged_in');
+                this.updateBackgroundTracking();
+                this.render();
+                this.showAlert('success', 'Break ended!');
+            }
+
+            logAction(action) {
+                const log = {
+                    employee_id: this.currentUser.id,
+                    employee_name: this.currentUser.name,
+                    action: action,
+                    timestamp: new Date().toISOString()
+                };
+                this.dataManager.addLog(log);
+            }
+
+            startTimeUpdate() {
+                this.updateTime();
+                if (this.timeInterval) clearInterval(this.timeInterval);
+                this.timeInterval = setInterval(() => this.updateTime(), 1000);
+            }
+
+            updateTime() {
+                const timeElement = document.getElementById('currentTime');
+                if (timeElement) {
+                    timeElement.textContent = `Current Time: ${new Date().toLocaleString()}`;
+                }
+            }
+
+            showAlert(type, message) {
+                const alertClass = type === 'success' ? 'alert-success' : type === 'warning' ? 'alert-warning' : 'alert-error';
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert ${alertClass}`;
+                alertDiv.textContent = message;
+                
+                const container = document.querySelector('.container');
+                if (container) {
+                    container.insertBefore(alertDiv, container.firstChild);
+                    setTimeout(() => alertDiv.remove(), 3000);
+                }
+            }
+
+            exportMonthlyReport() {
+                const users = this.dataManager.getUsers();
+                const employees = Object.entries(users).filter(([id, data]) => data.role === 'employee');
+                
+                const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                               'July', 'August', 'September', 'October', 'November', 'December'];
+
+                let csv = `SWAJAY - Monthly Performance Report - ${months[this.selectedMonth]} ${this.selectedYear}\n\n`;
+                csv += 'Employee ID,Employee Name,Days Worked,Total Hours,Break Hours,Target Hours,Achievement %\n';
+
+                employees.forEach(([empId, userData]) => {
+                    const stats = this.dataManager.getEmployeeStats(empId, this.selectedMonth, this.selectedYear);
+                    const targetHours = stats.days * 8;
+                    const progress = targetHours > 0 ? (stats.netHours / targetHours) * 100 : 0;
+                    
+                    csv += `${empId},${userData.name},${stats.days},${stats.netHours},${stats.breakHours},${targetHours},${progress.toFixed(0)}%\n`;
+                });
+
+                this.downloadCSV(csv, `Swajay_Report_${this.selectedYear}_${this.selectedMonth + 1}.csv`);
+            }
+
+            downloadCSV(csv, filename) {
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                window.URL.revokeObjectURL(url);
+                this.showAlert('success', 'Report exported!');
+            }
+
+            logout() {
+                if (this.timeInterval) clearInterval(this.timeInterval);
+                if (this.dashboardInterval) clearInterval(this.dashboardInterval);
+                
+                if (this.currentUser && this.currentUser.role === 'employee') {
+                    sessionStorage.removeItem('currentEmpId');
+                    sessionStorage.removeItem('currentStatus');
+                    sessionStorage.removeItem('loginTime');
+                    if (this.currentStatus !== 'logged_out') {
+                        this.dataManager.removeActiveLogin(this.currentUser.id);
+                    }
+                }
+
+                this.currentUser = null;
+                this.currentStatus = 'logged_out';
+                this.currentTab = 'dashboard';
+                this.render();
+            }
+
+            attachEventListeners() {
+                const passwordInput = document.getElementById('password');
+                if (passwordInput) {
+                    passwordInput.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            this.handleLogin();
+                        }
+                    });
+                }
+
+                const modal = document.getElementById('modal');
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        this.closeModal();
+                    }
+                });
+            }
+        }
+
+        // Initialize
+        let app;
+        window.addEventListener('DOMContentLoaded', () => {
+            app = new SwajayTimeTracker();
+        });
+    </script>
+</body>
+</html>
